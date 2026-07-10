@@ -1,5 +1,7 @@
 # ServeRest — Testes Automatizados com Cypress
 
+![CI](https://github.com/erkmnasc/ServeRest/actions/workflows/ci.yml/badge.svg)
+
 Suíte de testes automatizados para a aplicação [ServeRest](https://serverest.dev), cobrindo cenários **E2E de frontend** e **testes de API** (funcionais + contrato), desenvolvida com **Cypress + JavaScript**.
 
 - **Frontend:** https://front.serverest.dev/
