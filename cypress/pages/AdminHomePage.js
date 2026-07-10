@@ -5,6 +5,7 @@ class AdminHomePage {
   elements = {
     welcomeHeading: () => cy.get('h1'),
     logoutButton: () => cy.get('[data-testid="logout"]'),
+    // Card na home do admin (camelCase) — distinto do link "cadastrar-produtos" (com hífen) do navbar
     registerProductsCard: () => cy.get('[data-testid="cadastrarProdutos"]'),
   }
 

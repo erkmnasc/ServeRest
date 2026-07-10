@@ -3,16 +3,16 @@
  */
 class ClientHomePage {
   elements = {
-    initialMessage: () => cy.get('[data-testid="home-initial-message"]'),
     searchInput: () => cy.get('[data-testid="pesquisar"]'),
+    searchButton: () => cy.get('[data-testid="botaoPesquisar"]'),
     logoutButton: () => cy.get('[data-testid="logout"]'),
   }
 
   assertIsVisible() {
     // Regex ancorada no fim: diferencia "/home" (cliente) de "/admin/home" (admin)
     cy.url().should('match', /\/home$/)
-    this.elements.initialMessage().should('be.visible')
     this.elements.searchInput().should('be.visible')
+    this.elements.searchButton().should('be.visible')
     return this
   }
 }
