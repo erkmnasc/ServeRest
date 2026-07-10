@@ -19,6 +19,15 @@
   },
   "keywords": ["cypress", "e2e", "api-testing", "serverest", "qa", "sdet", "contract-testing", "load-testing", "k6"],
   "license": "MIT",
+  "author": "Erick Nascimento",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erkmnasc/ServeRest.git"
+  },
+  "bugs": {
+    "url": "https://github.com/erkmnasc/ServeRest/issues"
+  },
+  "homepage": "https://github.com/erkmnasc/ServeRest#readme",
   "devDependencies": {
     "@faker-js/faker": "^9.0.0",
     "ajv": "^8.17.1",
