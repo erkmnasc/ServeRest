@@ -1,0 +1,35 @@
+{
+  "name": "serverest-cypress-tests",
+  "version": "1.0.0",
+  "description": "Suíte de testes automatizados E2E (frontend) e de API para a aplicação ServeRest, com Cypress + JavaScript",
+  "scripts": {
+    "cy:open": "cypress open",
+    "test": "node scripts/run-tests-with-report.js",
+    "test:api": "node scripts/run-tests-with-report.js --spec \"cypress/e2e/api/**/*.cy.js\"",
+    "test:frontend": "node scripts/run-tests-with-report.js --spec \"cypress/e2e/frontend/**/*.cy.js\" --browser chrome",
+    "report:pdf": "node scripts/generate-report-pdf.js",
+    "serverest:local": "serverest",
+    "test:api:local": "cross-env CYPRESS_apiUrl=http://localhost:3000 start-server-and-test serverest:local http://localhost:3000/usuarios test:api",
+    "cy:open:local": "cross-env CYPRESS_apiUrl=http://localhost:3000 start-server-and-test serverest:local http://localhost:3000/usuarios cy:open",
+    "test:load": "start-server-and-test serverest:local http://localhost:3000/usuarios \"k6 run load-tests/usuarios.load.js\"",
+    "test:load:login": "start-server-and-test serverest:local http://localhost:3000/usuarios \"k6 run load-tests/login.load.js\"",
+    "lint": "eslint cypress --ext .js",
+    "format": "prettier --write \"cypress/**/*.js\" \"load-tests/**/*.js\" \"scripts/**/*.js\" \"*.js\"",
+    "format:check": "prettier --check \"cypress/**/*.js\" \"load-tests/**/*.js\" \"scripts/**/*.js\" \"*.js\""
+  },
+  "keywords": ["cypress", "e2e", "api-testing", "serverest", "qa", "sdet", "contract-testing", "load-testing", "k6"],
+  "license": "MIT",
+  "devDependencies": {
+    "@faker-js/faker": "^9.0.0",
+    "ajv": "^8.17.1",
+    "cross-env": "^10.1.0",
+    "cypress": "^13.17.0",
+    "cypress-mochawesome-reporter": "^3.8.2",
+    "eslint": "^8.57.0",
+    "eslint-plugin-cypress": "^3.5.0",
+    "prettier": "^3.3.3",
+    "puppeteer-core": "^25.3.0",
+    "serverest": "^3.2.0",
+    "start-server-and-test": "^3.0.11"
+  }
+}
