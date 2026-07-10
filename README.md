@@ -9,6 +9,12 @@ Suíte de testes automatizados para a aplicação [ServeRest](https://serverest.
 
 > Os cenários e as mensagens esperadas foram validados diretamente contra o **código-fonte oficial da ServeRest** (schemas Joi, controllers e constantes de mensagens), garantindo assertivas fiéis ao contrato real da aplicação — e não apenas ao Swagger.
 
+## 📄 Evidência de execução
+
+Uma **amostra da evidência em PDF** — com os resultados e os **screenshots da aplicação em execução** (login, cadastro e listagem de produtos) embutidos — está versionada em **[`evidencias/exemplos/`](evidencias/exemplos/)**, para consulta direta sem precisar rodar nada.
+
+A evidência é gerada automaticamente a cada execução (ver [Relatórios e evidência em PDF](#relatórios-e-evidência-em-pdf)).
+
 ## Cenários implementados
 
 ### Frontend (E2E) — `cypress/e2e/frontend/`
@@ -175,7 +181,7 @@ Thresholds definidos em cada script (`http_req_failed < 1%`, `p95 < 500ms`) faze
 
 ## Relatórios e evidência em PDF
 
-A execução headless gera um **relatório HTML (Mochawesome)** em `cypress/reports/index.html`, com gráficos e screenshots embutidos em caso de falha — cenários que falham já vêm com o erro e o stack trace expandidos por padrão, sem precisar interagir com o relatório.
+A execução headless gera um **relatório HTML (Mochawesome)** em `cypress/reports/index.html`, com gráficos e screenshots embutidos. Os specs de frontend capturam **screenshots da aplicação em execução** nos momentos-chave (`cy.screenshot()` — login autenticado, vitrine do cliente, produto listado, alertas de erro), que ficam embutidos no relatório e no PDF. Cenários que falham já vêm com o erro, o stack trace e o screenshot do momento da falha — sem precisar interagir com o relatório.
 
 `npm test`, `npm run test:api` e `npm run test:frontend` passam por um wrapper (`scripts/run-tests-with-report.js`) que, **independentemente do resultado da suíte**, converte esse HTML em PDF logo em seguida — a evidência é salva mesmo quando há cenários falhando, e o código de saída real do Cypress continua sendo propagado (a suíte falhando segue derrubando o comando/CI normalmente). Cada execução gera um PDF na pasta [`evidencias/`](evidencias/), com nome profissional e carimbo de data/hora, sem sobrescrever execuções anteriores:
 

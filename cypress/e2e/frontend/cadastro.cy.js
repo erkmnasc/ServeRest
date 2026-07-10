@@ -21,6 +21,7 @@ describe('Frontend | Cadastro de usuário', () => {
       registerUserPage.visit().fillForm(newAdmin).submit()
 
       adminHomePage.assertIsVisibleFor(newAdmin.nome)
+      cy.screenshot('cenario-4-cadastro-admin-sucesso')
     })
   })
 
@@ -45,6 +46,7 @@ describe('Frontend | Cadastro de usuário', () => {
 
       registerUserPage.assertRegisterError('Este email já está sendo usado')
       cy.url().should('include', '/cadastrarusuarios')
+      cy.screenshot('cenario-5-cadastro-email-duplicado-erro')
     })
   })
 })

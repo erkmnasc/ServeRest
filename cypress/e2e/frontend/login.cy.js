@@ -24,6 +24,9 @@ describe('Frontend | Login', () => {
 
       adminHomePage.assertIsVisibleFor(admin.nome)
       adminHomePage.elements.logoutButton().should('be.visible')
+
+      // Evidência visual: captura embutida no relatório/PDF (embeddedScreenshots)
+      cy.screenshot('cenario-1-login-admin-area-administrativa')
     })
   })
 
@@ -44,6 +47,7 @@ describe('Frontend | Login', () => {
       loginPage.visit().loginWith(commonUser)
 
       clientHomePage.assertIsVisible()
+      cy.screenshot('cenario-2-login-usuario-comum-vitrine')
     })
   })
 
@@ -52,6 +56,7 @@ describe('Frontend | Login', () => {
       loginPage.visit().loginWith(buildUser())
 
       loginPage.assertLoginError('Email e/ou senha inválidos')
+      cy.screenshot('cenario-3-login-invalido-alerta')
     })
   })
 })

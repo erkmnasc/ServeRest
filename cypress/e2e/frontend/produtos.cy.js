@@ -38,6 +38,7 @@ describe('Frontend | Produtos', () => {
       registerProductPage.visit().fillForm(product).submit()
 
       productListPage.assertProductIsListed(product)
+      cy.screenshot('cenario-6-produto-cadastrado-listagem')
     })
   })
 
@@ -73,6 +74,7 @@ describe('Frontend | Produtos', () => {
 
       registerProductPage.assertRegisterError('Já existe produto com esse nome')
       cy.url().should('include', '/admin/cadastrarprodutos')
+      cy.screenshot('cenario-7-produto-duplicado-erro')
     })
   })
 })
