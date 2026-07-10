@@ -65,5 +65,23 @@ describe('API | POST /login', () => {
         expect(response.body).to.deep.eq({ password: 'password é obrigatório' })
       })
     })
+
+    it('deve rejeitar requisição sem o campo email [400]', () => {
+      serverestApi.postLogin({ password: 'qualquer-senha' }).then((response) => {
+        expect(response.status).to.eq(400)
+        expect(response.body).to.deep.eq({ email: 'email é obrigatório' })
+      })
+    })
+
+    it('deve retornar todos os campos obrigatórios ausentes em uma única resposta [400]', () => {
+      // A API valida com abortEarly: false — email e password vêm juntos
+      serverestApi.postLogin({}).then((response) => {
+        expect(response.status).to.eq(400)
+        expect(response.body).to.deep.eq({
+          email: 'email é obrigatório',
+          password: 'password é obrigatório',
+        })
+      })
+    })
   })
 })

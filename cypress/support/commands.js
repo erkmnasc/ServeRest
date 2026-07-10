@@ -1,5 +1,5 @@
 import Ajv from 'ajv'
-import { buildUser } from '../utils/dataFactory'
+import { buildUser, buildProduct } from '../utils/dataFactory'
 import * as serverestApi from './api/serverestApi'
 import loginPage from '../pages/LoginPage'
 
@@ -26,6 +26,19 @@ Cypress.Commands.add('getAuthToken', ({ email, password }) => {
   return serverestApi.postLogin({ email, password }).then((response) => {
     expect(response.status, 'setup: autenticação via API').to.eq(200)
     return cy.wrap(response.body.authorization, { log: false })
+  })
+})
+
+/**
+ * Cria um produto via API (setup de estado por API) e retorna o produto com o id gerado.
+ * Requer token de administrador — a rota POST /produtos é exclusiva de admin.
+ */
+Cypress.Commands.add('createProductViaApi', (token, overrides = {}) => {
+  const product = buildProduct(overrides)
+
+  return serverestApi.postProduct(product, token).then((response) => {
+    expect(response.status, 'setup: criação de produto via API').to.eq(201)
+    return cy.wrap({ ...product, id: response.body._id }, { log: false })
   })
 })
 

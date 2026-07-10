@@ -11,3 +11,13 @@ export const productSchema = {
   },
   additionalProperties: false,
 }
+
+export const productListSchema = {
+  type: 'object',
+  required: ['quantidade', 'produtos'],
+  properties: {
+    quantidade: { type: 'integer' },
+    produtos: { type: 'array', items: productSchema },
+  },
+  additionalProperties: false,
+}

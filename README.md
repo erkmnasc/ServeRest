@@ -27,9 +27,10 @@ Suíte de testes automatizados para a aplicação [ServeRest](https://serverest.
 
 | Endpoint | Cenários | Spec |
 |----------|----------|------|
-| `POST /login` | Autenticação válida com validação de contrato · senha incorreta (401) · email inexistente com mesma mensagem genérica (401, anti-enumeração) · email inválido (400) · campo obrigatório ausente (400) | `login.api.cy.js` |
-| `/usuarios` | Criação com round-trip GET (201/200) · alteração via PUT (200) · exclusão confirmada (200→400) · email duplicado (400) · todos os campos obrigatórios em uma resposta (400) · `administrador` inválido (400) · consulta a id inexistente (400) | `usuarios.api.cy.js` |
-| `/produtos` | Criação autenticada com round-trip (201/200) · exclusão confirmada (200→400) · **sem token → 401 (autenticação)** · **usuário comum → 403 (autorização)** · nome duplicado (400) · preço inválido (400) | `produtos.api.cy.js` |
+| `POST /login` | Autenticação válida com validação de contrato · senha incorreta (401) · email inexistente com mesma mensagem genérica (401, anti-enumeração) · email inválido (400) · `password`/`email` ausentes (400) · todos os obrigatórios em uma resposta (400) | `login.api.cy.js` |
+| `/usuarios` | Criação com round-trip GET (201/200) · listagem com filtro por query + contrato da lista (200) · alteração via PUT (200) · **PUT em id inexistente cria — upsert (201)** · exclusão confirmada (200→400) · email duplicado no POST (400) · email duplicado no PUT (400) · todos os campos obrigatórios em uma resposta (400) · `administrador` inválido (400) · consulta a id inexistente (400) · **DELETE de id inexistente não é erro (200)** · **DELETE de usuário com carrinho (400, dependência)** | `usuarios.api.cy.js` |
+| `/produtos` | Criação autenticada com round-trip (201/200) · listagem com filtro + contrato da lista (200) · alteração via PUT (200) · **PUT em id inexistente cria — upsert (201)** · exclusão confirmada (200→400) · **sem token → 401** · **usuário comum → 403** (POST e PUT) · nome duplicado no POST e no PUT (400) · preço inválido (400) · campos obrigatórios em uma resposta (400) · **DELETE de id inexistente (200)** · **DELETE de produto em carrinho (400, dependência)** | `produtos.api.cy.js` |
+| `/carrinhos` | Criação autenticada com round-trip GET + contrato (201/200) · **baixa de estoque ao criar** · listagem pública + contrato · **concluir compra: mantém estoque baixado (200)** · **cancelar compra: reabastece estoque (200)** · sem token → 401 · produto inexistente (400) · **quantidade > estoque (400)** · produto duplicado (400) · **limite de 1 carrinho por usuário (400)** · quantidade não positiva / lista vazia (400, schema) · id inexistente (400) · concluir sem carrinho (200) | `carrinhos.api.cy.js` |
 
 ## Arquitetura
 
@@ -79,32 +80,52 @@ scripts/                 # Wrapper de execução + geração da evidência em PD
 
 ## Como executar
 
-Pré-requisito: Node.js 20+ (ver `.nvmrc`).
+Pré-requisito: **Node.js 20+** (ver `.nvmrc`). Nada além disso — **não é necessário Docker** para rodar o projeto.
 
 ```bash
-# Instalar dependências
 npm install
+```
 
-# Modo interativo
+### Modo interativo (com interface do Cypress)
+
+```bash
 npm run cy:open
+```
 
-# Toda a suíte (headless)
-npm test
+### Modo headless (linha de comando, sem interface — ideal para CI e validação rápida)
 
-# Somente testes de API
-npm run test:api
+Estes comandos rodam **direto contra a API/front públicos** (`serverest.dev`), sem nenhum setup de ambiente. É a forma mais simples para quem quer só clonar e validar:
 
-# Somente testes E2E de frontend
-npm run test:frontend
+```bash
+npm test              # toda a suíte (API + frontend), headless
+npm run test:api      # somente testes de API, headless
+npm run test:frontend # somente E2E de frontend, headless (Chrome)
+```
 
-# Qualidade de código
+### Qualidade de código
+
+```bash
 npm run lint
 npm run format:check
 ```
 
-## Ambiente local do backend
+## Onde os testes rodam — online vs. local
 
-A instância pública (`serverest.dev`) é compartilhada por toda a comunidade e sofre quedas (HTTP 503) periódicas — o que derruba tanto os testes de API quanto o setup/teardown via API dos specs de frontend. Para tornar os **testes de API determinísticos**, o projeto sobe um backend ServeRest local e aponta a suíte para ele automaticamente:
+O projeto suporta **duas fontes de backend**, e a escolha é só do avaliador — sem alterar código:
+
+| Forma | Comando | Backend usado | Precisa de quê? |
+|---|---|---|---|
+| **Online (padrão)** | `npm run test:api` | `serverest.dev` público | Só `npm install` |
+| **Local via Node** | `npm run test:api:local` | Backend subido pelo pacote `serverest` (devDependency) | Só `npm install` (sem Docker) |
+| **Local via Docker** | `docker compose up -d` + `CYPRESS_apiUrl=http://localhost:3000 npm run test:api` | Container oficial `paulogoncalvesbh/serverest` | Docker |
+
+> **Para quem só quer validar rapidamente:** use `npm run test:api` (ou `npm test`). Roda online, headless, sem Docker, sem subir nada. O backend local é uma conveniência para determinismo (a instância pública cai com 503 de vez em quando), **não um requisito**.
+
+A escolha do alvo é feita pela variável de ambiente **`CYPRESS_apiUrl`** (padrão: `https://serverest.dev`). Os specs de frontend sempre usam o front público — ver a decisão de escopo mais abaixo.
+
+## Ambiente local do backend (opcional, para determinismo)
+
+Quando quiser rodar os testes de API sem depender da instância pública, o projeto sobe um backend ServeRest local e aponta a suíte para ele automaticamente:
 
 ```bash
 # Sobe o backend local (porta 3000), roda os testes de API contra ele e encerra o processo ao final
@@ -117,9 +138,9 @@ npm run cy:open:local
 npm run serverest:local
 ```
 
-Por baixo dos panos: `start-server-and-test` sobe o backend (pacote `serverest`, instalado como devDependency), espera `http://localhost:3000/usuarios` responder, roda os testes com `CYPRESS_apiUrl=http://localhost:3000` e derruba o processo ao final — sem passos manuais.
+Por baixo dos panos: `start-server-and-test` sobe o backend (pacote `serverest`, instalado como devDependency), espera `http://localhost:3000/usuarios` responder, roda os testes com `CYPRESS_apiUrl=http://localhost:3000` e derruba o processo ao final — sem passos manuais e **sem Docker**.
 
-**Alternativa via Docker**, caso prefira não instalar o backend como dependência Node:
+**Alternativa via Docker**, caso prefira o container oficial em vez do pacote Node:
 
 ```bash
 docker compose up -d
@@ -188,7 +209,6 @@ A base pública do ServeRest é **compartilhada e resetada periodicamente**, e a
 ## Possíveis evoluções
 
 - Tags de execução seletiva com `@cypress/grep` (smoke vs. regressão);
-- Cobertura dos fluxos de `/carrinhos` (concluir/cancelar compra, regras de estoque);
 - Execução paralela com Cypress Cloud;
 - Testes de acessibilidade com `cypress-axe`;
 - Stack 100% local (fork do frontend com URL da API configurável via env + docker-compose orquestrando os dois serviços), eliminando também a dependência externa dos specs de frontend;

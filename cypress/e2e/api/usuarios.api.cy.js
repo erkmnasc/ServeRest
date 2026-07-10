@@ -1,7 +1,7 @@
 import * as serverestApi from '../../support/api/serverestApi'
 import { buildUser, buildNonexistentId } from '../../utils/dataFactory'
 import { recordCreatedSchema } from '../../schemas/common.schema'
-import { userSchema } from '../../schemas/usuarios.schema'
+import { userSchema, userListSchema } from '../../schemas/usuarios.schema'
 
 describe('API | /usuarios', () => {
   const createdUserIds = []
@@ -29,6 +29,37 @@ describe('API | /usuarios', () => {
           expect(getResponse.body).to.deep.eq({ ...user, _id: userId })
           cy.validateSchema(getResponse.body, userSchema)
         })
+      })
+    })
+
+    it('deve listar usuários e filtrar por email, validando o contrato da lista [200]', () => {
+      cy.createUserViaApi().then((user) => {
+        createdUserIds.push(user.id)
+
+        // Filtro por query string deve retornar exatamente o usuário criado
+        serverestApi.getUsers({ email: user.email }).then((response) => {
+          expect(response.status).to.eq(200)
+          expect(response.body.quantidade).to.eq(1)
+
+          const { id, ...fields } = user
+          expect(response.body.usuarios[0]).to.deep.eq({ ...fields, _id: id })
+          cy.validateSchema(response.body, userListSchema)
+        })
+      })
+    })
+
+    it('deve criar um novo usuário ao fazer PUT em id inexistente (upsert) [201]', () => {
+      const newUser = buildUser()
+      const nonexistentId = buildNonexistentId()
+
+      serverestApi.putUser(nonexistentId, newUser).then((response) => {
+        expect(response.status).to.eq(201)
+        expect(response.body.message).to.eq('Cadastro realizado com sucesso')
+        cy.validateSchema(response.body, recordCreatedSchema)
+
+        // O id é gerado pela API — não reaproveita o valor inexistente enviado na URL
+        expect(response.body._id).to.not.eq(nonexistentId)
+        createdUserIds.push(response.body._id)
       })
     })
 
@@ -103,6 +134,61 @@ describe('API | /usuarios', () => {
       serverestApi.getUserById(buildNonexistentId()).then((response) => {
         expect(response.status).to.eq(400)
         expect(response.body.message).to.eq('Usuário não encontrado')
+      })
+    })
+
+    it('não deve alterar um usuário para um email já utilizado por outro [400]', () => {
+      cy.createUserViaApi().then((userA) => {
+        createdUserIds.push(userA.id)
+
+        cy.createUserViaApi().then((userB) => {
+          createdUserIds.push(userB.id)
+
+          // Tenta alterar B atribuindo o email já pertencente a A
+          serverestApi.putUser(userB.id, buildUser({ email: userA.email })).then((response) => {
+            expect(response.status).to.eq(400)
+            expect(response.body.message).to.eq('Este email já está sendo usado')
+          })
+        })
+      })
+    })
+
+    it('deve retornar sucesso ao excluir um id inexistente, sem remover nada [200]', () => {
+      // Comportamento contraintuitivo, porém fiel ao contrato: DELETE de id inexistente
+      // não é erro — a API responde 200 informando que nada foi excluído
+      serverestApi.deleteUser(buildNonexistentId()).then((response) => {
+        expect(response.status).to.eq(200)
+        expect(response.body.message).to.eq('Nenhum registro excluído')
+      })
+    })
+
+    it('não deve excluir um usuário que possui carrinho cadastrado [400]', () => {
+      // Regra de dependência: um usuário com carrinho não pode ser removido
+      cy.createUserViaApi({ administrador: 'true' }).then((user) => {
+        createdUserIds.push(user.id)
+
+        cy.getAuthToken(user).then((token) => {
+          cy.createProductViaApi(token).then((product) => {
+            serverestApi
+              .postCart({ produtos: [{ idProduto: product.id, quantidade: 1 }] }, token)
+              .then((cartResponse) => {
+                expect(cartResponse.status, 'setup: criação de carrinho').to.eq(201)
+
+                serverestApi.deleteUser(user.id).then((response) => {
+                  expect(response.status).to.eq(400)
+                  expect(response.body.message).to.eq(
+                    'Não é permitido excluir usuário com carrinho cadastrado',
+                  )
+                  expect(response.body.idCarrinho).to.eq(cartResponse.body._id)
+                })
+
+                // Teardown local: libera o carrinho e o produto para que o usuário
+                // possa ser removido no hook after() centralizado
+                serverestApi.cancelarCompra(token)
+                serverestApi.deleteProduct(product.id, token)
+              })
+          })
+        })
       })
     })
   })

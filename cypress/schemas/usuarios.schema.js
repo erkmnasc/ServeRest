@@ -10,3 +10,13 @@ export const userSchema = {
   },
   additionalProperties: false,
 }
+
+export const userListSchema = {
+  type: 'object',
+  required: ['quantidade', 'usuarios'],
+  properties: {
+    quantidade: { type: 'integer' },
+    usuarios: { type: 'array', items: userSchema },
+  },
+  additionalProperties: false,
+}

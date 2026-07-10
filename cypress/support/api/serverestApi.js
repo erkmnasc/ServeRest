@@ -85,10 +85,65 @@ export const getProductById = (id) =>
     failOnStatusCode: false,
   })
 
+// PUT em /produtos é upsert: cria (201) quando o id não existe, altera (200) quando existe
+export const putProduct = (id, product, authorization = null) =>
+  cy.request({
+    method: 'PUT',
+    url: apiUrl(`/produtos/${id}`),
+    body: product,
+    headers: authorization ? { Authorization: authorization } : {},
+    failOnStatusCode: false,
+  })
+
 export const deleteProduct = (id, authorization) =>
   cy.request({
     method: 'DELETE',
     url: apiUrl(`/produtos/${id}`),
     headers: { Authorization: authorization },
+    failOnStatusCode: false,
+  })
+
+// ---------- /carrinhos ----------
+// Rotas de escrita (POST/DELETE) exigem token; as de leitura (GET) são públicas.
+
+export const postCart = (cart, authorization = null) =>
+  cy.request({
+    method: 'POST',
+    url: apiUrl('/carrinhos'),
+    body: cart,
+    headers: authorization ? { Authorization: authorization } : {},
+    failOnStatusCode: false,
+  })
+
+export const getCarts = (query = {}) =>
+  cy.request({
+    method: 'GET',
+    url: apiUrl('/carrinhos'),
+    qs: query,
+    failOnStatusCode: false,
+  })
+
+export const getCartById = (id) =>
+  cy.request({
+    method: 'GET',
+    url: apiUrl(`/carrinhos/${id}`),
+    failOnStatusCode: false,
+  })
+
+// Conclui a compra: remove o carrinho e MANTÉM o estoque baixado
+export const concluirCompra = (authorization = null) =>
+  cy.request({
+    method: 'DELETE',
+    url: apiUrl('/carrinhos/concluir-compra'),
+    headers: authorization ? { Authorization: authorization } : {},
+    failOnStatusCode: false,
+  })
+
+// Cancela a compra: remove o carrinho e REABASTECE o estoque dos produtos
+export const cancelarCompra = (authorization = null) =>
+  cy.request({
+    method: 'DELETE',
+    url: apiUrl('/carrinhos/cancelar-compra'),
+    headers: authorization ? { Authorization: authorization } : {},
     failOnStatusCode: false,
   })

@@ -1,7 +1,7 @@
 import * as serverestApi from '../../support/api/serverestApi'
-import { buildProduct } from '../../utils/dataFactory'
+import { buildProduct, buildNonexistentId } from '../../utils/dataFactory'
 import { recordCreatedSchema } from '../../schemas/common.schema'
-import { productSchema } from '../../schemas/produtos.schema'
+import { productSchema, productListSchema } from '../../schemas/produtos.schema'
 
 describe('API | /produtos', () => {
   let admin
@@ -71,6 +71,49 @@ describe('API | /produtos', () => {
         })
       })
     })
+
+    it('deve listar produtos e filtrar por nome, validando o contrato da lista [200]', () => {
+      cy.createProductViaApi(adminToken).then((product) => {
+        createdProductIds.push(product.id)
+
+        serverestApi.getProducts({ nome: product.nome }).then((response) => {
+          expect(response.status).to.eq(200)
+          expect(response.body.quantidade).to.eq(1)
+          expect(response.body.produtos[0]).to.deep.include({ nome: product.nome, _id: product.id })
+          cy.validateSchema(response.body, productListSchema)
+        })
+      })
+    })
+
+    it('deve alterar um produto existente como administrador [200]', () => {
+      cy.createProductViaApi(adminToken).then((product) => {
+        createdProductIds.push(product.id)
+        const updatedProduct = buildProduct()
+
+        serverestApi.putProduct(product.id, updatedProduct, adminToken).then((response) => {
+          expect(response.status).to.eq(200)
+          expect(response.body.message).to.eq('Registro alterado com sucesso')
+
+          serverestApi.getProductById(product.id).then((getResponse) => {
+            expect(getResponse.body).to.deep.include({ ...updatedProduct, _id: product.id })
+          })
+        })
+      })
+    })
+
+    it('deve criar um novo produto ao fazer PUT em id inexistente (upsert) [201]', () => {
+      const nonexistentId = buildNonexistentId()
+      const product = buildProduct()
+
+      serverestApi.putProduct(nonexistentId, product, adminToken).then((response) => {
+        expect(response.status).to.eq(201)
+        expect(response.body.message).to.eq('Cadastro realizado com sucesso')
+        cy.validateSchema(response.body, recordCreatedSchema)
+
+        expect(response.body._id).to.not.eq(nonexistentId)
+        createdProductIds.push(response.body._id)
+      })
+    })
   })
 
   context('Cenários negativos', () => {
@@ -111,6 +154,91 @@ describe('API | /produtos', () => {
       serverestApi.postProduct(buildProduct({ preco: -10 }), adminToken).then((response) => {
         expect(response.status).to.eq(400)
         expect(response.body).to.deep.eq({ preco: 'preco deve ser um número positivo' })
+      })
+    })
+
+    it('deve validar todos os campos obrigatórios do produto em uma única resposta [400]', () => {
+      serverestApi.postProduct({}, adminToken).then((response) => {
+        expect(response.status).to.eq(400)
+        expect(response.body).to.deep.eq({
+          nome: 'nome é obrigatório',
+          preco: 'preco é obrigatório',
+          descricao: 'descricao é obrigatório',
+          quantidade: 'quantidade é obrigatório',
+        })
+      })
+    })
+
+    it('não deve alterar um produto para um nome já utilizado por outro [400]', () => {
+      cy.createProductViaApi(adminToken).then((productA) => {
+        createdProductIds.push(productA.id)
+
+        cy.createProductViaApi(adminToken).then((productB) => {
+          createdProductIds.push(productB.id)
+
+          serverestApi
+            .putProduct(productB.id, buildProduct({ nome: productA.nome }), adminToken)
+            .then((response) => {
+              expect(response.status).to.eq(400)
+              expect(response.body.message).to.eq('Já existe produto com esse nome')
+            })
+        })
+      })
+    })
+
+    it('não deve alterar produto sem token de autenticação [401]', () => {
+      serverestApi.putProduct(buildNonexistentId(), buildProduct()).then((response) => {
+        expect(response.status).to.eq(401)
+        expect(response.body.message).to.eq(
+          'Token de acesso ausente, inválido, expirado ou usuário do token não existe mais',
+        )
+      })
+    })
+
+    it('não deve alterar produto com usuário sem perfil de administrador [403]', () => {
+      serverestApi
+        .putProduct(buildNonexistentId(), buildProduct(), commonUserToken)
+        .then((response) => {
+          expect(response.status).to.eq(403)
+          expect(response.body.message).to.eq('Rota exclusiva para administradores')
+        })
+    })
+
+    it('deve retornar sucesso ao excluir um id de produto inexistente, sem remover nada [200]', () => {
+      serverestApi.deleteProduct(buildNonexistentId(), adminToken).then((response) => {
+        expect(response.status).to.eq(200)
+        expect(response.body.message).to.eq('Nenhum registro excluído')
+      })
+    })
+
+    it('não deve excluir um produto que faz parte de um carrinho [400]', () => {
+      // Regra de dependência: um produto presente em algum carrinho não pode ser removido.
+      // Usa um usuário dedicado para o carrinho, evitando ocupar o slot do admin compartilhado.
+      cy.createProductViaApi(adminToken).then((product) => {
+        createdProductIds.push(product.id)
+
+        cy.createUserViaApi().then((cartUser) => {
+          cy.getAuthToken(cartUser).then((cartToken) => {
+            serverestApi
+              .postCart({ produtos: [{ idProduto: product.id, quantidade: 1 }] }, cartToken)
+              .then((cartResponse) => {
+                expect(cartResponse.status, 'setup: criação de carrinho').to.eq(201)
+
+                serverestApi.deleteProduct(product.id, adminToken).then((response) => {
+                  expect(response.status).to.eq(400)
+                  expect(response.body.message).to.eq(
+                    'Não é permitido excluir produto que faz parte de carrinho',
+                  )
+                  expect(response.body.idCarrinhos).to.include(cartResponse.body._id)
+                })
+
+                // Teardown local: libera o carrinho (para o produto poder ser removido
+                // no after()) e remove o usuário auxiliar
+                serverestApi.cancelarCompra(cartToken)
+                serverestApi.deleteUser(cartUser.id)
+              })
+          })
+        })
       })
     })
   })
