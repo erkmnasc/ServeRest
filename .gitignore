@@ -6,3 +6,7 @@ cypress/reports/
 .claude/
 .DS_Store
 *.log
+
+# Evidências geradas a cada execução: a pasta e sua documentação são versionadas,
+# mas os PDFs (artefatos binários regenerados) não entram no histórico do git.
+evidencias/*.pdf

@@ -4,9 +4,9 @@
   "description": "Suíte de testes automatizados E2E (frontend) e de API para a aplicação ServeRest, com Cypress + JavaScript",
   "scripts": {
     "cy:open": "cypress open",
-    "test": "node scripts/run-tests-with-report.js",
-    "test:api": "node scripts/run-tests-with-report.js --spec \"cypress/e2e/api/**/*.cy.js\"",
-    "test:frontend": "node scripts/run-tests-with-report.js --spec \"cypress/e2e/frontend/**/*.cy.js\" --browser chrome",
+    "test": "cross-env EVIDENCE_SCOPE=Suite-Completa node scripts/run-tests-with-report.js",
+    "test:api": "cross-env EVIDENCE_SCOPE=API node scripts/run-tests-with-report.js --spec \"cypress/e2e/api/**/*.cy.js\"",
+    "test:frontend": "cross-env EVIDENCE_SCOPE=Frontend node scripts/run-tests-with-report.js --spec \"cypress/e2e/frontend/**/*.cy.js\" --browser chrome",
     "report:pdf": "node scripts/generate-report-pdf.js",
     "serverest:local": "serverest",
     "test:api:local": "cross-env CYPRESS_apiUrl=http://localhost:3000 start-server-and-test serverest:local http://localhost:3000/usuarios test:api",

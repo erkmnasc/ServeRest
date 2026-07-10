@@ -12,9 +12,11 @@ const testRun = spawnSync('npx', ['cypress', 'run', ...cypressArgs], {
   shell: true,
 })
 
-const reportRun = spawnSync('node', [path.join(__dirname, 'generate-report-pdf.js')], {
+// Chama o gerador com o binário do Node atual (process.execPath) e SEM shell:
+// com shell: true, um caminho contendo espaços (ex.: "C:\Users\Erick Nascimento")
+// seria quebrado pelo shell, fazendo o Node tentar carregar o módulo errado.
+const reportRun = spawnSync(process.execPath, [path.join(__dirname, 'generate-report-pdf.js')], {
   stdio: 'inherit',
-  shell: true,
 })
 
 if (reportRun.status !== 0) {

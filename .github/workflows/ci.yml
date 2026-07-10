@@ -45,12 +45,16 @@ jobs:
       - name: Gerar evidência em PDF do relatório
         if: always()
         run: node scripts/generate-report-pdf.js
-      - name: Publicar relatório HTML e PDF
+        env:
+          EVIDENCE_SCOPE: API
+      - name: Publicar relatório HTML e evidência em PDF
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: relatorio-api
-          path: cypress/reports
+          path: |
+            cypress/reports
+            evidencias/*.pdf
           if-no-files-found: ignore
 
   frontend-tests:
@@ -67,12 +71,16 @@ jobs:
       - name: Gerar evidência em PDF do relatório
         if: always()
         run: node scripts/generate-report-pdf.js
-      - name: Publicar relatório HTML e PDF
+        env:
+          EVIDENCE_SCOPE: Frontend
+      - name: Publicar relatório HTML e evidência em PDF
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: relatorio-frontend
-          path: cypress/reports
+          path: |
+            cypress/reports
+            evidencias/*.pdf
           if-no-files-found: ignore
       - name: Publicar screenshots em caso de falha
         uses: actions/upload-artifact@v4

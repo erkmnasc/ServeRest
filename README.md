@@ -49,6 +49,7 @@ cypress/
 
 load-tests/              # Cenários de carga (k6) — somente contra backend local
 scripts/                 # Wrapper de execução + geração da evidência em PDF
+evidencias/              # PDFs de evidência por execução (nome com escopo + data/hora)
 ```
 
 ## Padrões de projeto e boas práticas
@@ -176,14 +177,17 @@ Thresholds definidos em cada script (`http_req_failed < 1%`, `p95 < 500ms`) faze
 
 A execução headless gera um **relatório HTML (Mochawesome)** em `cypress/reports/index.html`, com gráficos e screenshots embutidos em caso de falha — cenários que falham já vêm com o erro e o stack trace expandidos por padrão, sem precisar interagir com o relatório.
 
-`npm test`, `npm run test:api` e `npm run test:frontend` passam por um wrapper (`scripts/run-tests-with-report.js`) que, **independentemente do resultado da suíte**, converte esse HTML em PDF logo em seguida — a evidência é salva mesmo quando há cenários falhando, e o código de saída real do Cypress continua sendo propagado (a suíte falhando segue derrubando o comando/CI normalmente). Cada execução gera um arquivo carimbado com data/hora em `cypress/reports/pdf/`, sem sobrescrever execuções anteriores:
+`npm test`, `npm run test:api` e `npm run test:frontend` passam por um wrapper (`scripts/run-tests-with-report.js`) que, **independentemente do resultado da suíte**, converte esse HTML em PDF logo em seguida — a evidência é salva mesmo quando há cenários falhando, e o código de saída real do Cypress continua sendo propagado (a suíte falhando segue derrubando o comando/CI normalmente). Cada execução gera um PDF na pasta [`evidencias/`](evidencias/), com nome profissional e carimbo de data/hora, sem sobrescrever execuções anteriores:
 
-```bash
-cypress/reports/
-├── index.html
-└── pdf/
-    └── relatorio-2026-07-10T14-30-00-000Z.pdf
 ```
+evidencias/
+├── README.md                                          # convenção de nomes
+├── ServeRest_Evidencia-API_2026-07-10_14-33-05.pdf
+├── ServeRest_Evidencia-Frontend_2026-07-10_14-40-12.pdf
+└── ServeRest_Evidencia-Suite-Completa_2026-07-10_15-02-58.pdf
+```
+
+O escopo no nome (`API`, `Frontend`, `Suite-Completa`) vem da variável `EVIDENCE_SCOPE`, definida por cada script npm — ver [`evidencias/README.md`](evidencias/README.md) para a convenção completa. Os PDFs ficam fora do controle de versão (são artefatos regenerados); no CI, cada job publica sua evidência como *artifact*.
 
 A conversão usa `puppeteer-core` apontando para o Chrome já instalado na máquina (o mesmo usado por `--browser chrome`), em vez de baixar um segundo Chromium — em runners Linux/CI usa `google-chrome-stable`; no Windows, o Chrome instalado em `Program Files`. Para gerar o PDF de um relatório já existente sem rodar a suíte de novo: `npm run report:pdf`.
 
@@ -194,7 +198,7 @@ Pipeline em GitHub Actions com três estágios: **lint/formatação** → **test
 - **Testes de API**: rodam contra um backend ServeRest local, subido como *service container* Docker (`paulogoncalvesbh/serverest`) — não dependem da disponibilidade da instância pública para o CI ficar verde.
 - **Testes de frontend**: rodam contra `front.serverest.dev` / `serverest.dev` (ver decisão de escopo acima).
 
-Relatório HTML, evidência em PDF e screenshots de falha são publicados como artefatos de cada job.
+Relatório HTML, evidência em PDF (pasta `evidencias/`) e screenshots de falha são publicados como artefatos de cada job.
 
 ## Observações sobre o ambiente
 
