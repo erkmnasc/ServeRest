@@ -9,7 +9,7 @@ Diferente da pasta `evidencias/` (onde cada execução gera um PDF com carimbo d
 data/hora, ignorado pelo git), os arquivos **aqui são versionados**.
 
 O PDF de exemplo inclui os **screenshots da aplicação em execução** (login,
-cadastro, listagem de produtos) embutidos no relatório — capturados pelos
+cadastro, listagem de produtos) embutidos no relatório, capturados pelos
 `cy.screenshot()` dos specs de frontend.
 
 ## Como atualizar a amostra

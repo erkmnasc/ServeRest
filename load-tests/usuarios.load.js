@@ -3,7 +3,7 @@ import { check, sleep } from 'k6'
 import { Rate } from 'k6/metrics'
 
 // ATENÇÃO: este script gera carga real. Rode SOMENTE contra um backend local
-// (`npm run serverest:local` ou Docker) — nunca contra https://serverest.dev,
+// (`npm run serverest:local` ou Docker), nunca contra https://serverest.dev,
 // que é uma instância pública e compartilhada; carga artificial degradaria o
 // serviço para outras pessoas.
 const BASE_URL = __ENV.BASE_URL || 'http://localhost:3000'

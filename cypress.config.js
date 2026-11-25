@@ -4,7 +4,7 @@ module.exports = defineConfig({
   reporter: 'cypress-mochawesome-reporter',
   reporterOptions: {
     reportDir: 'cypress/reports',
-    reportPageTitle: 'ServeRest — Relatório de Testes',
+    reportPageTitle: 'ServeRest | Relatório de Testes',
     charts: true,
     embeddedScreenshots: true,
     inlineAssets: true,
@@ -22,7 +22,7 @@ module.exports = defineConfig({
     },
     env: {
       // Specs de frontend dependem do front público, que chama https://serverest.dev
-      // internamente (URL fixa no código deles) — por isso o padrão aqui é o mesmo host.
+      // internamente (URL fixa no código deles), por isso o padrão aqui é o mesmo host.
       // Os specs de API podem sobrescrever via CYPRESS_apiUrl=http://localhost:3000
       // (ver scripts "*:local" no package.json) sem afetar os specs de frontend.
       apiUrl: 'https://serverest.dev',

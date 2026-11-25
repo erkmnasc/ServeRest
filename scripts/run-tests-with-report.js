@@ -3,7 +3,7 @@ const path = require('path')
 
 // Roda a suíte e, independentemente do resultado (inclusive com cenários falhando),
 // gera a evidência em PDF do relatório antes de propagar o código de saída real do
-// Cypress — assim uma falha nos testes segue derrubando o build/CI normalmente,
+// Cypress, assim uma falha nos testes segue derrubando o build/CI normalmente,
 // mas a evidência do que aconteceu nunca deixa de ser salva.
 const cypressArgs = process.argv.slice(2)
 

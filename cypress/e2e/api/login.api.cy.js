@@ -74,7 +74,7 @@ describe('API | POST /login', () => {
     })
 
     it('deve retornar todos os campos obrigatórios ausentes em uma única resposta [400]', () => {
-      // A API valida com abortEarly: false — email e password vêm juntos
+      // A API valida com abortEarly: false, email e password vêm juntos
       serverestApi.postLogin({}).then((response) => {
         expect(response.status).to.eq(400)
         expect(response.body).to.deep.eq({

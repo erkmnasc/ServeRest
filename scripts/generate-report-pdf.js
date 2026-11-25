@@ -51,7 +51,7 @@ function evidenceFilename() {
 
 async function main() {
   if (!fs.existsSync(REPORT_HTML)) {
-    console.warn(`Nenhum relatório HTML encontrado em ${REPORT_HTML} — nada para converter em PDF.`)
+    console.warn(`Nenhum relatório HTML encontrado em ${REPORT_HTML}, nada para converter em PDF.`)
     return
   }
 

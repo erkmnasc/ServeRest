@@ -1,5 +1,5 @@
 /**
- * Page Object Model — Cadastro e Listagem de Produtos (área administrativa)
+ * Page Object: Cadastro e Listagem de Produtos (área administrativa)
  */
 class RegisterProductPage {
   elements = {

@@ -57,7 +57,7 @@ describe('API | /usuarios', () => {
         expect(response.body.message).to.eq('Cadastro realizado com sucesso')
         cy.validateSchema(response.body, recordCreatedSchema)
 
-        // O id é gerado pela API — não reaproveita o valor inexistente enviado na URL
+        // O id é gerado pela API, não reaproveita o valor inexistente enviado na URL
         expect(response.body._id).to.not.eq(nonexistentId)
         createdUserIds.push(response.body._id)
       })
@@ -109,7 +109,7 @@ describe('API | /usuarios', () => {
     })
 
     it('deve validar todos os campos obrigatórios em uma única resposta [400]', () => {
-      // A API usa abortEarly: false — todos os erros de campo retornam juntos
+      // A API usa abortEarly: false, todos os erros de campo retornam juntos
       serverestApi.postUser({}).then((response) => {
         expect(response.status).to.eq(400)
         expect(response.body).to.deep.eq({
@@ -155,7 +155,7 @@ describe('API | /usuarios', () => {
 
     it('deve retornar sucesso ao excluir um id inexistente, sem remover nada [200]', () => {
       // Comportamento contraintuitivo, porém fiel ao contrato: DELETE de id inexistente
-      // não é erro — a API responde 200 informando que nada foi excluído
+      // não é erro, a API responde 200 informando que nada foi excluído
       serverestApi.deleteUser(buildNonexistentId()).then((response) => {
         expect(response.status).to.eq(200)
         expect(response.body.message).to.eq('Nenhum registro excluído')

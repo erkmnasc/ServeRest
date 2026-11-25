@@ -26,6 +26,6 @@ export const buildProduct = (overrides = {}) => ({
 
 /**
  * Gera um id sintaticamente válido (16 caracteres alfanuméricos, padrão da API),
- * porém inexistente na base — útil para cenários de "não encontrado".
+ * porém inexistente na base, útil para cenários de "não encontrado".
  */
 export const buildNonexistentId = () => faker.string.alphanumeric(16)

@@ -1,5 +1,5 @@
 /**
- * Page Object Model — Home do Usuário Comum (vitrine de compras)
+ * Page Object: Home do Usuário Comum (vitrine de compras)
  */
 class ClientHomePage {
   elements = {

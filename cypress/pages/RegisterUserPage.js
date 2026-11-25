@@ -1,5 +1,5 @@
 /**
- * Page Object Model — Cadastro de Usuário (tela pública)
+ * Page Object: Cadastro de Usuário (tela pública)
  */
 class RegisterUserPage {
   elements = {

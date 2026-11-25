@@ -1,5 +1,5 @@
 /**
- * Page Object Model — Tela de Login
+ * Page Object: Tela de Login
  * Seletores baseados em data-testid (estáveis e desacoplados de CSS/layout),
  * verificados no código-fonte do frontend da ServeRest.
  */

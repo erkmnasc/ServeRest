@@ -6,7 +6,7 @@ import loginPage from '../pages/LoginPage'
 const ajv = new Ajv({ allErrors: true })
 
 /**
- * Cria um usuário via API (setup de estado por API — mais rápido e estável
+ * Cria um usuário via API (setup de estado por API, mais rápido e estável
  * do que preparar massa pela interface) e retorna o usuário com o id gerado.
  */
 Cypress.Commands.add('createUserViaApi', (overrides = {}) => {
@@ -20,7 +20,7 @@ Cypress.Commands.add('createUserViaApi', (overrides = {}) => {
 
 /**
  * Obtém um token de autenticação via API para uso em rotas protegidas.
- * Obs.: o token da ServeRest expira em 600s — suficiente para uma execução.
+ * Obs.: o token da ServeRest expira em 600s, suficiente para uma execução.
  */
 Cypress.Commands.add('getAuthToken', ({ email, password }) => {
   return serverestApi.postLogin({ email, password }).then((response) => {
@@ -31,7 +31,7 @@ Cypress.Commands.add('getAuthToken', ({ email, password }) => {
 
 /**
  * Cria um produto via API (setup de estado por API) e retorna o produto com o id gerado.
- * Requer token de administrador — a rota POST /produtos é exclusiva de admin.
+ * Requer token de administrador: a rota POST /produtos é exclusiva de admin.
  */
 Cypress.Commands.add('createProductViaApi', (token, overrides = {}) => {
   const product = buildProduct(overrides)
@@ -65,5 +65,5 @@ Cypress.Commands.add('validateSchema', (body, schema) => {
   const validate = ajv.compile(schema)
   const isValid = validate(body)
 
-  expect(isValid, `contrato da resposta — ${JSON.stringify(validate.errors)}`).to.be.true
+  expect(isValid, `contrato da resposta: ${JSON.stringify(validate.errors)}`).to.be.true
 })
