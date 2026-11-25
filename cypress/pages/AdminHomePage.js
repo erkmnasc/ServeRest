@@ -10,7 +10,9 @@ class AdminHomePage {
   }
 
   assertIsVisibleFor(userName) {
-    cy.url().should('include', '/admin/home')
+    // Depois do cadastro o front mostra o alerta de sucesso e só então redireciona,
+    // o que pode passar dos 4s padrão do Cypress
+    cy.url({ timeout: 15000 }).should('include', '/admin/home')
     // Asserções separadas evitam fragilidade com espaçamento do texto "Bem Vindo  {nome}"
     this.elements
       .welcomeHeading()

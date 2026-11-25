@@ -5,9 +5,15 @@ import * as serverestApi from '../../support/api/serverestApi'
 
 describe('Frontend | Cadastro de usuário', () => {
   context('Cenário 4: cadastro de administrador pela interface', () => {
-    const newAdmin = buildUser({ administrador: 'true' })
+    let newAdmin
 
-    after(() => {
+    // Massa nova a cada tentativa: com retries, um email fixo faria a segunda
+    // tentativa falhar com "Este email já está sendo usado"
+    beforeEach(() => {
+      newAdmin = buildUser({ administrador: 'true' })
+    })
+
+    afterEach(() => {
       // O id não é exposto na UI: localiza o usuário criado pelo email para remoção
       serverestApi.getUsers({ email: newAdmin.email }).then(({ body }) => {
         const createdUser = body.usuarios?.[0]

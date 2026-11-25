@@ -87,7 +87,7 @@ evidencias/              # PDFs de evidência por execução (nome com escopo + 
 
 ## Como executar
 
-Pré-requisito: **Node.js 20+** (ver `.nvmrc`). Nada além disso — **não é necessário Docker** para rodar o projeto.
+Pré-requisito: **Node.js 22+** (ver `.nvmrc`). Nada além disso — **não é necessário Docker** para rodar o projeto.
 
 ```bash
 npm install
