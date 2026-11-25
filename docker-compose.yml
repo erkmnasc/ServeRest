@@ -1,6 +1,6 @@
 services:
   serverest:
-    image: paulogoncalvesbh/serverest:latest
+    image: paulogoncalvesbh/serverest:3.5.0
     ports:
       - '3000:3000'
     healthcheck:

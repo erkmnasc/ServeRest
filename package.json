@@ -48,7 +48,7 @@
     "eslint-plugin-cypress": "^3.5.0",
     "prettier": "^3.3.3",
     "puppeteer-core": "^25.3.0",
-    "serverest": "^3.2.0",
+    "serverest": "^3.5.0",
     "start-server-and-test": "^3.0.11"
   }
 }

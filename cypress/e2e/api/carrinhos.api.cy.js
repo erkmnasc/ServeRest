@@ -268,7 +268,8 @@ describe('API | /carrinhos', () => {
     it('deve rejeitar carrinho com a lista de produtos vazia [400]', () => {
       serverestApi.postCart({ produtos: [] }, cartToken).then((response) => {
         expect(response.status).to.eq(400)
-        expect(response.body).to.deep.eq({ produtos: 'produtos não contém 1 valor obrigatório' })
+        // Mensagem do schema a partir da ServeRest 3.5.0
+        expect(response.body).to.deep.eq({ produtos: 'produtos deve ter pelo menos 1 item' })
       })
     })
 
