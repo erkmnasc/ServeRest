@@ -142,7 +142,8 @@ Cypress é mantido). O nome do arquivo leva o escopo e a data, por exemplo
 GitHub Actions em três jobs: lint e formatação, depois testes de API e de
 frontend em paralelo. Os testes de API rodam contra o ServeRest num service
 container, então o CI não depende da instância pública. Relatório, PDF e
-screenshots de falha ficam como artefatos de cada execução.
+screenshots de falha ficam como artefatos de cada execução. O pipeline também roda toda
+segunda-feira.
 
 ## Observações
 
