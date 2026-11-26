@@ -96,11 +96,11 @@ depender dela:
 npm run test:api:local
 ```
 
-O comando sobe o ServeRest local (pacote `serverest`, já nas devDependencies),
+O comando sobe o ServeRest 3.5.0 local (`npx serverest@3.5.0`, sem instalar nada),
 espera a porta 3000 responder, roda os testes com
-`CYPRESS_apiUrl=http://localhost:3000` e derruba o servidor no fim. Também dá
+`API_URL=http://localhost:3000` e derruba o servidor no fim. Também dá
 para usar o container oficial: `docker compose up -d` e depois
-`CYPRESS_apiUrl=http://localhost:3000 npm run test:api`.
+`API_URL=http://localhost:3000 npm run test:api`.
 
 O frontend sempre roda contra o ambiente público: o front da ServeRest tem a
 URL da API fixa no código, então não dá para apontá-lo para um backend local

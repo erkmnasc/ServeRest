@@ -41,7 +41,7 @@ jobs:
         with:
           spec: cypress/e2e/api/**/*.cy.js
         env:
-          CYPRESS_apiUrl: http://localhost:3000
+          API_URL: http://localhost:3000
       - name: Gerar evidência em PDF do relatório
         if: always()
         run: node scripts/generate-report-pdf.js

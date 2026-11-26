@@ -8,9 +8,9 @@
     "test:api": "cross-env EVIDENCE_SCOPE=API node scripts/run-tests-with-report.js --spec \"cypress/e2e/api/**/*.cy.js\"",
     "test:frontend": "cross-env EVIDENCE_SCOPE=Frontend node scripts/run-tests-with-report.js --spec \"cypress/e2e/frontend/**/*.cy.js\" --browser chrome",
     "report:pdf": "node scripts/generate-report-pdf.js",
-    "serverest:local": "serverest",
-    "test:api:local": "cross-env CYPRESS_apiUrl=http://localhost:3000 start-server-and-test serverest:local http://localhost:3000/usuarios test:api",
-    "cy:open:local": "cross-env CYPRESS_apiUrl=http://localhost:3000 start-server-and-test serverest:local http://localhost:3000/usuarios cy:open",
+    "serverest:local": "npx --yes serverest@3.5.0",
+    "test:api:local": "cross-env API_URL=http://localhost:3000 start-server-and-test serverest:local http://localhost:3000/usuarios test:api",
+    "cy:open:local": "cross-env API_URL=http://localhost:3000 start-server-and-test serverest:local http://localhost:3000/usuarios cy:open",
     "test:load": "start-server-and-test serverest:local http://localhost:3000/usuarios \"k6 run load-tests/usuarios.load.js\"",
     "test:load:login": "start-server-and-test serverest:local http://localhost:3000/usuarios \"k6 run load-tests/login.load.js\"",
     "lint": "eslint cypress --ext .js",
@@ -39,16 +39,19 @@
   },
   "homepage": "https://github.com/erkmnasc/ServeRest#readme",
   "devDependencies": {
-    "@faker-js/faker": "^9.0.0",
+    "@faker-js/faker": "^10.6.0",
     "ajv": "^8.17.1",
     "cross-env": "^10.1.0",
-    "cypress": "^15.21.2",
-    "cypress-mochawesome-reporter": "^3.8.2",
+    "cypress": "^16.4.0",
+    "cypress-mochawesome-reporter": "^5.0.0",
     "eslint": "^8.57.0",
     "eslint-plugin-cypress": "^3.5.0",
     "prettier": "^3.3.3",
     "puppeteer-core": "^25.3.0",
-    "serverest": "^3.5.0",
     "start-server-and-test": "^3.0.11"
+  },
+  "overrides": {
+    "glob": "^14.0.6",
+    "minimatch": "^11.0.9"
   }
 }

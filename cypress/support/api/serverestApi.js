@@ -7,7 +7,7 @@
  * permitindo verificar explicitamente fluxos felizes e de erro.
  */
 
-const apiUrl = (path) => `${Cypress.env('apiUrl')}${path}`
+const apiUrl = (path) => `${Cypress.expose('apiUrl')}${path}`
 
 // ---------- /login ----------
 

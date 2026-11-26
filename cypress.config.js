@@ -20,12 +20,12 @@ module.exports = defineConfig({
       runMode: 1,
       openMode: 0,
     },
-    env: {
+    expose: {
       // Specs de frontend dependem do front público, que chama https://serverest.dev
       // internamente (URL fixa no código deles), por isso o padrão aqui é o mesmo host.
-      // Os specs de API podem sobrescrever via CYPRESS_apiUrl=http://localhost:3000
+      // Os specs de API podem apontar para outro backend com API_URL=http://localhost:3000
       // (ver scripts "*:local" no package.json) sem afetar os specs de frontend.
-      apiUrl: 'https://serverest.dev',
+      apiUrl: process.env.API_URL || 'https://serverest.dev',
     },
     setupNodeEvents(on, config) {
       require('cypress-mochawesome-reporter/plugin')(on)
